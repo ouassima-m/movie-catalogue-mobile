@@ -2,4 +2,6 @@
     <string name="app_name">Level5Task2</string>
     <string name="search_placeholder">testtest</string>
     <string name="search_movie_hint">Search for a movie by name</string>
+    <string name="favHeader">Your favorite movies !</string>
+    <string name="add_and_remove_fav">Currently not favorite. Favorize:</string>
 </resources>

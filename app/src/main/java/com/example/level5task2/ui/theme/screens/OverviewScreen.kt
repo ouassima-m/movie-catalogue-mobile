@@ -1,6 +1,8 @@
 package com.example.level5task2.ui.theme.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -8,6 +10,9 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.ThumbUp
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -15,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -23,6 +29,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -46,11 +53,17 @@ fun OverviewScreen(
             Column (
                 modifier = Modifier
                     .padding(innerPadding)
-            ){
-                SearchView {  }
+                    .fillMaxWidth()
 
-                ScreenContent(
-                    Modifier.fillMaxWidth()
+            ){
+                Row (
+                ){
+                    SearchView {  }
+                    FavButton(navController = navController)
+
+                }
+                OverviewScreenContent(
+                    modifier= Modifier
                 )
             }
 
@@ -58,8 +71,10 @@ fun OverviewScreen(
     )
 }
 
+
+
 @Composable
-fun ScreenContent(modifier: Modifier) {
+fun OverviewScreenContent(modifier: Modifier) {
     Text(text = "Hello World")
 }
 
@@ -78,7 +93,7 @@ fun SearchView(
         onValueChange = { value ->
             searchQueryState.value = value
         },
-        modifier = Modifier.fillMaxWidth(),
+//        modifier = Modifier.fillMaxWidth(),
         textStyle = TextStyle(fontSize = 18.sp),
         leadingIcon = {
             if (searchQueryState.value != TextFieldValue(String())) {
@@ -123,4 +138,26 @@ fun SearchView(
         singleLine = true,
         shape = RectangleShape, // The TextFiled has rounded corners top left and right by default
     )
+}
+
+
+@Composable
+fun FavButton(navController: NavHostController) {
+    Button(
+        onClick = {
+            navController.navigate(MovieScreens.FavoritesScreen.route)
+        },
+        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+        modifier = Modifier.fillMaxWidth()
+
+
+    ){
+        Icon(
+            imageVector = Icons.Default.ThumbUp,
+            contentDescription = "thumbUp",
+            tint =  Color.Green,
+            modifier = Modifier
+                .size(40.dp)
+            )
+    }
 }
