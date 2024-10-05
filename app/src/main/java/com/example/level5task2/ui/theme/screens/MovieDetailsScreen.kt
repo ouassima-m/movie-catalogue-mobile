@@ -63,7 +63,6 @@ fun DetailsAddButton() {
                 tint =  Color.Green,
                 modifier = Modifier
                     .size(40.dp)
-                //ihihihih
             )
         }
     }
