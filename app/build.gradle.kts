@@ -1,9 +1,18 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
 
     id("kotlin-kapt")
 //    id("com.google.gms.google-services")
+}
+
+// Load apikey.properties file
+val apikeyPropertiesFile = rootProject.file("apikey.properties")
+val apikeyProperties = Properties().apply {
+    load(FileInputStream(apikeyPropertiesFile))
 }
 
 android {
@@ -16,6 +25,9 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
+
+        // Load API keys from apikey.properties
+        buildConfigField("String", "API_KEY", "\"${apikeyProperties.getProperty("API_KEY")}\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -41,6 +53,10 @@ android {
     }
     buildFeatures {
         compose = true
+
+        //idk
+        buildConfig = true
+
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
