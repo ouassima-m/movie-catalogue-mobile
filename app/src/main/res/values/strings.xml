@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Level5Task2</string>
+    <string name="search_placeholder">testtest</string>
+    <string name="search_movie_hint">Search for a movie by name</string>
 </resources>
