@@ -4,6 +4,6 @@ import com.example.level5task2.data.model.Movies
 import retrofit2.http.GET
 
 interface ApiService {
-    @GET("")
+    @GET("/search/movie?json=true")
     suspend fun getMovies(): Movies
 }
