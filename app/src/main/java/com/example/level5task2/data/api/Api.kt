@@ -12,7 +12,7 @@ class Api {
 
         val movieClient by lazy { createApi(baseUrl) }
 
-        private fun createApi(baseUrl: String): ApiService {
+        fun createApi(baseUrl: String): ApiService {
             val client = OkHttpClient()
 
             val request = Request.Builder()
