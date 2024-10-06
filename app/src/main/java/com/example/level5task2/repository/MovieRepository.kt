@@ -11,7 +11,7 @@ class MovieRepository {
     private val _apiService : ApiService = Api.movieClient
 
     //suspend function that calls a suspend function from the numbersApi
-    suspend fun getMovies(): Resource<Movies> {
+    suspend fun getMovies(): Resource<List<Movies>> {
         val response = try {
             withTimeout(5_000){
                 _apiService.getMovies()

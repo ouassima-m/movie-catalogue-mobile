@@ -14,11 +14,16 @@ class ViewModel : ViewModel(){
 
     private val _movieRepository = MovieRepository()
 
-    val movieResource: LiveData<Resource<Movies>> get()
-        = _movieResource
+//    val movieResource: LiveData<Resource<Movies>> get()
+//        = _movieResource
+//
+//    private val _movieResource: MutableLiveData<Resource<Movies>>
+//        = MutableLiveData(Resource.Empty())
 
-    private val _movieResource: MutableLiveData<Resource<Movies>>
-        = MutableLiveData(Resource.Empty())
+    val movieResource: LiveData<Resource<List<Movies>>> get() = _movieResource
+
+    private val _movieResource: MutableLiveData<Resource<List<Movies>>> = MutableLiveData(Resource.Empty())
+
 
     fun getMovies() {
         _movieResource.value = Resource.Loading()
@@ -26,6 +31,7 @@ class ViewModel : ViewModel(){
         viewModelScope.launch {
             _movieResource.value = _movieRepository.getMovies()
         }
+
     }
 
     fun searchMovies(searchQuery: String) {
