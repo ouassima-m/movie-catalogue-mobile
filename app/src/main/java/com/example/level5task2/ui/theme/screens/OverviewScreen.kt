@@ -47,11 +47,9 @@ import com.example.level5task2.data.model.Movies
 import com.example.level5task2.viewmodel.ViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import coil.compose.rememberAsyncImagePainter
-
-
-
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,6 +58,7 @@ fun OverviewScreen(
     viewModel: ViewModel
 ){
     val movieResource : Resource<List<Movies>>? by viewModel.movieResource.observeAsState()
+    var isLoading by remember { mutableStateOf(false) }
 
 //    val posterIMGList = when (movieResource) {
 //        is Resource.Success -> movieResource?.data?.map { it.posterIMG } ?: emptyList()
@@ -76,18 +75,24 @@ fun OverviewScreen(
         is Resource.Error ->
             emptyList()
 
-        is Resource.Loading ->
+        is Resource.Loading ->{
+            isLoading = true
             emptyList()
-
+        }
         is Resource.Empty ->
             emptyList()
-
         else ->
             emptyList()
     }
 
-    Log.d("Movie here", movieResource.toString())
+    Log.d("movieResource here", movieResource.toString())
+//    val searchMovies = {searchTMDB: String->
+//        viewModel.searchMovies(searchTMDB)}
 
+    // Function to call the search in ViewModel
+//    val searchMovies: (String) -> Unit = { searchTMDB ->
+//        viewModel.searchMovies(searchTMDB) // Call ViewModel's search function
+//    }
 
     Scaffold (
         content = { innerPadding ->
@@ -97,26 +102,66 @@ fun OverviewScreen(
                     .fillMaxWidth(),
 //                viewModel.getMovies()
             ){
-                Row (
-                ){
-                    SearchView {  }
+                Row (){
+                    SearchView (
+                        searchTMDB = {
+                            movie: String ->
+                            viewModel.getMovies(movie)
+                            Log.d("overview: searchTMDB", movie)
+
+                        }
+
+                    )
+                    }
                     FavButton(navController = navController)
 
-                }
-
-                Movie(
-                    posterIMGlist = posterIMGList
+                Dispaly(
+                    viewModel = viewModel,
+                    posterIMGlist = posterIMGList,
+                    isLoading = isLoading,
+                    hasNoResults = posterIMGList.isEmpty()
                 )
+
+
+
+//                Movie(
+//                    posterIMGlist = posterIMGList
+//                )
             }
 
         }
     )
 }
 
+@Composable
+fun Dispaly(
+    viewModel: ViewModel,
+    posterIMGlist: List<String>,
+    isLoading: Boolean,
+    hasNoResults: Boolean
+){
+    if (isLoading) {
+        Text(
+            text = "Loading...",
+            modifier = Modifier.padding(16.dp),
+            fontSize = 18.sp
+        )
+    } else if (hasNoResults) {
+        Text(
+            text = "Maybe none?",
+            modifier = Modifier.padding(16.dp),
+            fontSize = 18.sp
+        )
+    } else {
+        Movie(posterIMGlist)
+    }
+}
+
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SearchView(
-    searchTMDB: (String) -> Unit
+    searchTMDB: (String) -> Unit,
+//    searchMovies: (String) -> Unit
 ) {
     val searchQueryState = rememberSaveable(stateSaver = TextFieldValue.Saver)  {
         mutableStateOf(TextFieldValue(String()))
@@ -150,6 +195,8 @@ fun SearchView(
         },
         trailingIcon = {
             IconButton(onClick = {
+                searchTMDB(searchQueryState.value.text)
+                Log.d("overview: searchQueryState.value.text", searchQueryState.value.text)
                 // TODO your logic here
 
                 //based on @ExperimentalComposeUiApi - if this doesn't work in a newer version remove it
@@ -175,29 +222,6 @@ fun SearchView(
     )
 }
 
-
-@Composable
-fun FavButton(
-    navController: NavHostController
-) {
-    Button(
-        onClick = {
-            navController.navigate(MovieScreens.FavoritesScreen.route)
-        },
-        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-        modifier = Modifier.fillMaxWidth()
-
-
-    ){
-        Icon(
-            imageVector = Icons.Default.ThumbUp,
-            contentDescription = "thumbUp",
-            tint =  Color.Green,
-            modifier = Modifier
-                .size(40.dp)
-            )
-    }
-}
 
 @Composable
 fun Movie(
@@ -232,3 +256,29 @@ fun MovieCard(
         )
     }
 }
+
+
+@Composable
+fun FavButton(
+    navController: NavHostController
+) {
+    Button(
+        onClick = {
+            navController.navigate(MovieScreens.FavoritesScreen.route)
+        },
+        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+        modifier = Modifier.fillMaxWidth()
+
+
+    ){
+        Icon(
+            imageVector = Icons.Default.ThumbUp,
+            contentDescription = "thumbUp",
+            tint =  Color.Green,
+            modifier = Modifier
+                .size(40.dp)
+        )
+    }
+}
+
+

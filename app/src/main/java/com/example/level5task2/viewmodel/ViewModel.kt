@@ -1,5 +1,6 @@
 package com.example.level5task2.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -25,24 +26,25 @@ class ViewModel : ViewModel(){
     private val _movieResource: MutableLiveData<Resource<List<Movies>>> = MutableLiveData(Resource.Empty())
 
 
-    fun getMovies() {
+    fun getMovies(movie: String) {
         _movieResource.value = Resource.Loading()
 
         viewModelScope.launch {
-            _movieResource.value = _movieRepository.getMovies()
-        }
 
+            _movieResource.value = _movieRepository.getMovies(movie)
+            Log.d("ViewModel: getMovies", _movieResource.value.toString())
+        }
     }
 
-    fun searchMovies(searchQuery: String) {
-        if (searchQuery.isBlank()) {
-            _movieResource.value = Resource.Empty()
-        }
-        else {
-            viewModelScope.launch {
-                _movieResource.value = Resource.Loading()
-                _movieResource.value = _movieRepository.getMovies()
-            }
-        }
-    }
+//    fun searchMovies(searchQuery: String, movie: String) {
+//        if (searchQuery.isBlank()) {
+//            _movieResource.value = Resource.Empty()
+//        }
+//        else {
+//            viewModelScope.launch {
+//                _movieResource.value = Resource.Loading()
+//                _movieResource.value = _movieRepository.getMovies(movie)
+//            }
+//        }
+//    }
 }
