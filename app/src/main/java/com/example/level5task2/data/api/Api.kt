@@ -1,50 +1,46 @@
 package com.example.level5task2.data.api
 
+import android.util.Log
 import com.example.level5task2.BuildConfig.API_KEY
+import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 class Api {
     companion object {
-        // The base url off the api.
-        const val baseUrl = "https://api.themoviedb.org/3/"
-        const val API_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5Yzc2N2YyMzY5ZWQ3ZjUxMjViYmE2YzMyYmI2ZDBjOCIsIm5iZiI6MTcyODE2MDYzOS45NTIxNDQsInN1YiI6IjY3MDEzOWNjNmZjNzRlNTc1NmY4NDVmZSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.hOF1m6CihgbcA5xM7W1RnsQ_vY2tnncUjL3PoG8GEnI"
+
+        const val baseUrl = "https://api.themoviedb.org/"
 
         val movieClient by lazy { createApi(baseUrl) }
 
-        fun createApi(baseUrl: String): ApiService {
-            val client = OkHttpClient.Builder()
+        private fun createApi(baseUrl: String): ApiService {
+
+            val client = OkHttpClient.Builder().apply {
+                addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+            }
                 .addInterceptor { chain ->
-                    val original = chain.request()
-                    val request = original.newBuilder()
+                    val original: Request = chain.request()
+                    val request: Request = original.newBuilder()
                         .header("accept", "application/json")
-                        .header("Authorization", "Bearer $API_KEY") // Add your API key here
+                        .header("Authorization", "Bearer $API_KEY")
+                        .method(original.method, original.body)
                         .build()
                     chain.proceed(request)
+//                        .header("accept", "application/json")
+//                        .header("Authorization", "Bearer $API_KEY")
                 }
                 .build()
-
-//            val request = Request.Builder()
-//                .url("https://api.themoviedb.org/3/search/movie?include_adult=false&language=en-US&page=1")
-//                .get()
-//                .addHeader("accept", "application/json")
-////                .addHeader("Authorization", "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5Yzc2N2YyMzY5ZWQ3ZjUxMjViYmE2YzMyYmI2ZDBjOCIsIm5iZiI6MTcyODE2MDYzOS45NTIxNDQsInN1YiI6IjY3MDEzOWNjNmZjNzRlNTc1NmY4NDVmZSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.hOF1m6CihgbcA5xM7W1RnsQ_vY2tnncUjL3PoG8GEnI")
-//                .addHeader("Authorization", "Bearer $API_KEY")
-//                .build()
-
-//            val response = client.newCall(request).execute()
 
             return Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
+//                .addConverterFactory(GsonConverterFactory.create(gson))
                 .build()
                 .create(ApiService::class.java)
-
-
         }
-
     }
 }

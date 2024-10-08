@@ -1,18 +1,17 @@
 package com.example.level5task2.ui.theme.screens
 
+import android.graphics.Movie
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
@@ -43,13 +42,11 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.level5task2.R
 import com.example.level5task2.data.api.util.Resource
-import com.example.level5task2.data.model.Movies
 import com.example.level5task2.viewmodel.ViewModel
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import coil.compose.rememberAsyncImagePainter
+import com.example.level5task2.data.model.MovieResult
+import com.example.level5task2.data.model.Movies
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,42 +54,19 @@ fun OverviewScreen(
     navController: NavHostController,
     viewModel: ViewModel
 ){
-    val movieResource : Resource<List<Movies>>? by viewModel.movieResource.observeAsState()
-    var isLoading by remember { mutableStateOf(false) }
+    val movieResultResource : Resource<MovieResult>? by viewModel.movieResultResource.observeAsState()
+    val moviesResource : Resource<Movies>? by viewModel.moviesResource.observeAsState()
 
-//    val posterIMGList = when (movieResource) {
-//        is Resource.Success -> movieResource?.data?.map { it.posterIMG } ?: emptyList()
-//        is Resource.Error -> movieResource?.message
-//        is Resource.Loading -> stringResource(R.string.loading_text)
-//        is Resource.Empty -> stringResource(id = R.string.empty_posterIMG)
-//        else -> stringResource(R.string.something_wrong_state)
-//    }
 
-    val posterIMGList: List<String> = when (movieResource)  {
-        is Resource.Success ->
-            movieResource?.data?.map { it.posterIMG } ?: emptyList()
 
-        is Resource.Error ->
-            emptyList()
-
-        is Resource.Loading ->{
-            isLoading = true
-            emptyList()
-        }
-        is Resource.Empty ->
-            emptyList()
-        else ->
-            emptyList()
+    val posterIMGList = when (moviesResource) {
+        is Resource.Success -> moviesResource?.data?.posterIMG
+        is Resource.Error -> movieResultResource?.message
+        is Resource.Loading -> stringResource(R.string.loading_text)
+        is Resource.Empty -> stringResource(id = R.string.maybe_none_empty)
+        else -> stringResource(R.string.something_wrong_state)
     }
-
-    Log.d("movieResource here", movieResource.toString())
-//    val searchMovies = {searchTMDB: String->
-//        viewModel.searchMovies(searchTMDB)}
-
-    // Function to call the search in ViewModel
-//    val searchMovies: (String) -> Unit = { searchTMDB ->
-//        viewModel.searchMovies(searchTMDB) // Call ViewModel's search function
-//    }
+    Log.d("movieResource here", moviesResource.toString())
 
     Scaffold (
         content = { innerPadding ->
@@ -108,60 +82,106 @@ fun OverviewScreen(
                             movie: String ->
                             viewModel.getMovies(movie)
                             Log.d("overview: searchTMDB", movie)
-
-                        }
+                        },
+                        posterIMGList = posterIMGList
 
                     )
                     }
                     FavButton(navController = navController)
 
-                Dispaly(
+                Display(
                     viewModel = viewModel,
-                    posterIMGlist = posterIMGList,
-                    isLoading = isLoading,
-                    hasNoResults = posterIMGList.isEmpty()
+                    moviesResource = moviesResource,
+                    movieResultResource = movieResultResource,
+                    isLoading = moviesResource is Resource.Loading,
+                    hasNoResults = moviesResource is Resource.Empty,
                 )
-
-
-
-//                Movie(
-//                    posterIMGlist = posterIMGList
-//                )
             }
 
         }
     )
 }
-
 @Composable
-fun Dispaly(
+fun Display(
     viewModel: ViewModel,
-    posterIMGlist: List<String>,
+    moviesResource: Resource<Movies>?,
+    movieResultResource: Resource<MovieResult>?,
     isLoading: Boolean,
     hasNoResults: Boolean
-){
+) {
+    Log.d("Display: moviesResource", moviesResource.toString())
+    Log.d("Display: movieResultResource", movieResultResource.toString())
+
     if (isLoading) {
-        Text(
-            text = "Loading...",
-            modifier = Modifier.padding(16.dp),
-            fontSize = 18.sp
-        )
-    } else if (hasNoResults) {
-        Text(
-            text = "Maybe none?",
-            modifier = Modifier.padding(16.dp),
-            fontSize = 18.sp
-        )
+        Log.d("Display: movieResult is loading", movieResultResource?.data?.results.toString())
+
+        Text(text = "Loading...", modifier = Modifier.padding(16.dp), fontSize = 18.sp)
+    } else if (hasNoResults || (movieResultResource?.data?.results.isNullOrEmpty())) {
+        Log.d("Display: movieResult has no results", movieResultResource?.data?.results.toString())
+
+        Text(text = "Maybe none?", modifier = Modifier.padding(16.dp), fontSize = 18.sp)
     } else {
-        Movie(posterIMGlist)
+        Log.d("Display: movieResult else", movieResultResource?.data?.results.toString())
+
+        movieResultResource?.data?.results?.let { movies ->
+            LazyColumn {
+                items(movies) { movie ->
+                    MovieCard(movie)
+                }
+            }
+        }
     }
 }
+
+//    if (isLoading) {
+//        Log.d("Dispaly: movieResult is loading", movieResultResource?.data?.results.toString())
+//        Text(text = "Loading...", modifier = Modifier.padding(16.dp), fontSize = 18.sp)
+//
+//    } else if (hasNoResults || movieResultResource?.data?.results.isNullOrEmpty()) {
+//        Log.d("Dispaly: movieResult has no results", movieResultResource?.data?.results.toString())
+//        Text(text = "Maybe none?", modifier = Modifier.padding(16.dp), fontSize = 18.sp)
+//
+//    } else {
+//        Log.d("Dispaly: movieResult else", movieResultResource?.data?.results.toString())
+//        movieResultResource?.data?.results?.let { movies ->
+//
+//            LazyColumn {
+//                items(movies) { movie ->
+//                    MovieCard(movie)
+//                }
+//            }
+//        }
+//    }
+//}
+
+
+
+
+@Composable
+fun MovieCard(movie: Movies) {
+    Card(modifier = Modifier.padding(8.dp)) {
+        Column {
+            Image(
+                painter = rememberAsyncImagePainter(model =
+                //todo
+                "https://image.tmdb.org/t/p/w500${movie.posterIMG}"),
+                contentDescription = movie.title,
+                modifier = Modifier
+                    .height(300.dp)
+                    .fillMaxWidth()
+            )
+            Text(text = movie.title, modifier = Modifier.padding(8.dp))
+        }
+    }
+}
+
+
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SearchView(
     searchTMDB: (String) -> Unit,
-//    searchMovies: (String) -> Unit
+    posterIMGList: Any?,
 ) {
     val searchQueryState = rememberSaveable(stateSaver = TextFieldValue.Saver)  {
         mutableStateOf(TextFieldValue(String()))
@@ -197,10 +217,7 @@ fun SearchView(
             IconButton(onClick = {
                 searchTMDB(searchQueryState.value.text)
                 Log.d("overview: searchQueryState.value.text", searchQueryState.value.text)
-                // TODO your logic here
-
-                //based on @ExperimentalComposeUiApi - if this doesn't work in a newer version remove it
-                //no alternative in compose for hiding keyboard at time of writing
+//                Log.d("overvw test","hereee ${posterIMGList.toString()}")
                 keyboardController?.hide()
             }) {
                 Icon(
@@ -223,39 +240,39 @@ fun SearchView(
 }
 
 
-@Composable
-fun Movie(
-    posterIMGlist: List<String>
-){
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(3)
-    ) {
-        items(items = posterIMGlist, itemContent = { item ->
-            MovieCard(item)
-            Log.d("Movie heree", item)
-        }
-        )
-    }
-}
+//@Composable
+//fun Movie(
+//    posterIMGlist: String?
+//){
+//    LazyVerticalGrid(
+//        columns = GridCells.Fixed(3)
+//    ) {
+//        items(items = posterIMGlist, itemContent = { item ->
+//            MovieCard(item)
+//            Log.d("Movie heree", item)
+//        }
+//        )
+//    }
+//}
 
-@Composable
-fun MovieCard(
-    item: String
-) {
-    Card (
-        modifier = Modifier,
-        onClick = {}
-    ){
-        Image(
-            painter = rememberAsyncImagePainter(model = item),
-            contentDescription = "cat image here",
-            modifier = Modifier
-                .height(300.dp)
-                .width(300.dp)
-                .padding(15.dp)
-        )
-    }
-}
+//@Composable
+//fun MovieCard(
+//    item: String
+//) {
+//    Card (
+//        modifier = Modifier,
+//        onClick = {}
+//    ){
+//        Image(
+//            painter = rememberAsyncImagePainter(model = item),
+//            contentDescription = "cat image here",
+//            modifier = Modifier
+//                .height(300.dp)
+//                .width(300.dp)
+//                .padding(15.dp)
+//        )
+//    }
+//}
 
 
 @Composable

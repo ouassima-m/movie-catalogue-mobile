@@ -5,6 +5,6 @@
     <string name="favHeader">Your favorite movies !</string>
     <string name="add_and_remove_fav">Currently not favorite. Favorize:</string>
     <string name="loading_text">loading</string>
-    <string name="empty_posterIMG">Maybe none?</string>
+    <string name="maybe_none_empty">Maybe none?</string>
     <string name="something_wrong_state">somthing went wrong</string>
 </resources>

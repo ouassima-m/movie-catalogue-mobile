@@ -10,5 +10,4 @@ data class Movies(
     @SerializedName("release_date") val releaseDate: String,
     @SerializedName("popularity") val rating : Double,
     @SerializedName("overview") val overview  : String,
-
 )
