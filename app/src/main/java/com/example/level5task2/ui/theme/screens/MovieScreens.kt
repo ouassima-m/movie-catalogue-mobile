@@ -6,6 +6,8 @@ sealed class MovieScreens (
     ){
     object OverviewScreen : MovieScreens("Overview")
     object FavoritesScreen : MovieScreens("Favorites")
-    object MovieDetailsScreen : MovieScreens("MovieDetails")
+    object MovieDetailsScreen : MovieScreens("MovieDetails"){
+        fun createRoute(movieId: Int) = "MovieDetails/$movieId"
+    }
 
 }

@@ -21,9 +21,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.level5task2.ui.theme.Level5Task2Theme
 import com.example.level5task2.ui.theme.screens.FavoritesScreen
 import com.example.level5task2.ui.theme.screens.MovieDetailsScreen
@@ -66,8 +68,14 @@ private fun NavHost(
         composable ( route = MovieScreens.FavoritesScreen.route) {
             FavoritesScreen(navController, viewModel)
         }
-        composable ( route = MovieScreens.MovieDetailsScreen.route) {
-            MovieDetailsScreen(navController, viewModel)
+        //here movieid will be passed as part of the route like movieDetails/123
+        composable ( route = MovieScreens.MovieDetailsScreen.route + "/{movieId}",
+            //This specifies that the route expects a single argument movieId
+            arguments = listOf(navArgument("movieId")
+            { type = NavType.IntType }))
+        { backStackEntry ->
+            val movieId = backStackEntry.arguments?.getInt("movieId")
+            MovieDetailsScreen(navController, viewModel, movieId)
         }
     }
 }

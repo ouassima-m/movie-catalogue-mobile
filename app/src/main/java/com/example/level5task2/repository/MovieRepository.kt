@@ -18,7 +18,7 @@ class MovieRepository {
                 Log.d("MovieRepository", "Making API request with movie: $movie")
 
                 // Pass the movie name to the getMovies call
-                _apiService.getMovies(movie, apiKey = API_KEY)
+                _apiService.getMovies(movie)
 
 //                Log.d("MovieRepository1", "API call successful, received response: ${apiResponse.results}")
 //                apiResponse.results  // Return only the list of movies

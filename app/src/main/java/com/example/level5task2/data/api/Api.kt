@@ -41,6 +41,8 @@ class Api {
 //                .addConverterFactory(GsonConverterFactory.create(gson))
                 .build()
                 .create(ApiService::class.java)
+            // This creates the API service (ApiService) that defines the endpoints.
+
         }
     }
 }

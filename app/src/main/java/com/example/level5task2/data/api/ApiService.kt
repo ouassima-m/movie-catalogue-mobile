@@ -6,6 +6,7 @@ import com.google.android.gms.common.api.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
 
+//Retrofit gebruikt deze interface om HTTP requests te maken
 interface ApiService {
     @GET("3/search/movie?")
     suspend fun getMovies(
@@ -13,6 +14,6 @@ interface ApiService {
         @Query("language") language: String = "en-US",
         @Query("include_adult") includeAdult: Boolean = false,
         @Query("page") page: Int = 1,
-        @Query("api_key") apiKey: String
-    ): MovieResult
+//        @Query("api_key") apiKey: String
+    ): MovieResult //returns
 }

@@ -4,6 +4,7 @@ import com.google.gson.annotations.SerializedName
 import java.sql.Date
 
 data class Movies(
+    @SerializedName("id") val id : Int,
     @SerializedName("backdrop_path") val headerIMG : String,
     @SerializedName("poster_path") val posterIMG : String,
     @SerializedName("original_title") val title : String,

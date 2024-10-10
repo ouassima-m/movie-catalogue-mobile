@@ -5,12 +5,16 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -57,8 +61,6 @@ fun OverviewScreen(
     val movieResultResource : Resource<MovieResult>? by viewModel.movieResultResource.observeAsState()
     val moviesResource : Resource<Movies>? by viewModel.moviesResource.observeAsState()
 
-
-
     val posterIMGList = when (moviesResource) {
         is Resource.Success -> moviesResource?.data?.posterIMG
         is Resource.Error -> movieResultResource?.message
@@ -86,8 +88,9 @@ fun OverviewScreen(
                         posterIMGList = posterIMGList
 
                     )
-                    }
                     FavButton(navController = navController)
+
+                }
 
                 Display(
                     viewModel = viewModel,
@@ -95,6 +98,7 @@ fun OverviewScreen(
                     movieResultResource = movieResultResource,
                     isLoading = moviesResource is Resource.Loading,
                     hasNoResults = moviesResource is Resource.Empty,
+                    navController = navController
                 )
             }
 
@@ -104,6 +108,7 @@ fun OverviewScreen(
 @Composable
 fun Display(
     viewModel: ViewModel,
+    navController: NavHostController,
     moviesResource: Resource<Movies>?,
     movieResultResource: Resource<MovieResult>?,
     isLoading: Boolean,
@@ -124,54 +129,47 @@ fun Display(
         Log.d("Display: movieResult else", movieResultResource?.data?.results.toString())
 
         movieResultResource?.data?.results?.let { movies ->
-            LazyColumn {
+            LazyVerticalGrid (
+                columns = GridCells.Fixed(3)
+
+            ){
                 items(movies) { movie ->
-                    MovieCard(movie)
+                    MovieCard(
+                        navController = navController,
+                        movie = movie,
+
+                    )
                 }
             }
         }
     }
 }
 
-//    if (isLoading) {
-//        Log.d("Dispaly: movieResult is loading", movieResultResource?.data?.results.toString())
-//        Text(text = "Loading...", modifier = Modifier.padding(16.dp), fontSize = 18.sp)
-//
-//    } else if (hasNoResults || movieResultResource?.data?.results.isNullOrEmpty()) {
-//        Log.d("Dispaly: movieResult has no results", movieResultResource?.data?.results.toString())
-//        Text(text = "Maybe none?", modifier = Modifier.padding(16.dp), fontSize = 18.sp)
-//
-//    } else {
-//        Log.d("Dispaly: movieResult else", movieResultResource?.data?.results.toString())
-//        movieResultResource?.data?.results?.let { movies ->
-//
-//            LazyColumn {
-//                items(movies) { movie ->
-//                    MovieCard(movie)
-//                }
-//            }
-//        }
-//    }
-//}
-
-
-
-
 @Composable
-fun MovieCard(movie: Movies) {
-    Card(modifier = Modifier.padding(8.dp)) {
-        Column {
+fun MovieCard(
+    navController: NavHostController,
+    movie: Movies,
+) {
+    Card(
+//        modifier = Modifier.padding(8.dp)
+        onClick = {
+            navController.navigate(MovieScreens.MovieDetailsScreen.route + "/${movie.id}")
+            Log.d("MovieCard: movie.id", movie.id.toString())
+
+
+        }
+        ) {
             Image(
                 painter = rememberAsyncImagePainter(model =
                 //todo
-                "https://image.tmdb.org/t/p/w500${movie.posterIMG}"),
+                "https://image.tmdb.org/t/p/w500${movie.posterIMG}"
+                ),
                 contentDescription = movie.title,
                 modifier = Modifier
-                    .height(300.dp)
+                    .height(200.dp)
                     .fillMaxWidth()
             )
-            Text(text = movie.title, modifier = Modifier.padding(8.dp))
-        }
+
     }
 }
 

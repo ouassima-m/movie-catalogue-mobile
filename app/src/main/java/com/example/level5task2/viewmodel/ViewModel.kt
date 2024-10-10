@@ -19,11 +19,11 @@ class ViewModel : ViewModel(){
     val movieResultResource: LiveData<Resource<MovieResult>>
         get() = _movieResult
 
+    private val _movieResult: MutableLiveData<Resource<MovieResult>> = MutableLiveData()
+
+
     val moviesResource: LiveData<Resource<Movies>>
         get() = _movies
-
-
-    private val _movieResult: MutableLiveData<Resource<MovieResult>> = MutableLiveData()
 
     private val _movies: MutableLiveData<Resource<Movies>> = MutableLiveData()
 
@@ -38,4 +38,19 @@ class ViewModel : ViewModel(){
             Log.d("ViewModel: getMovies", _movieResult.value.toString())
         }
     }
+
+    fun getMovieById(movieId: Int?): Movies? {
+        return _movieResult.value?.data?.results?.find { it.id == movieId }
+    }
+
+//    fun getMoviesDetails(posterIMG: String) {
+//        _movieResult.value = Resource.Loading()
+//
+//        viewModelScope.launch {
+//            _movieResult.value = _movieRepository.getMovies(posterIMG)
+//
+//            Log.d("ViewModel: get the movie", posterIMG)
+//            Log.d("ViewModel: getMovies", _movieResult.value.toString())
+//        }
+//    }
 }
