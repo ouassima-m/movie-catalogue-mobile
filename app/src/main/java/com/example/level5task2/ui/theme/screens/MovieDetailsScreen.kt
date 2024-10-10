@@ -2,6 +2,7 @@ package com.example.level5task2.ui.theme.screens
 
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,6 +17,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -26,6 +28,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.level5task2.R
 import com.example.level5task2.data.model.Movies
 import com.example.level5task2.viewmodel.ViewModel
+import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 @Composable
 fun MovieDetailsScreen(
@@ -48,16 +51,20 @@ fun MovieDetailsScreen(
 
 @Composable
 fun DetailsScreenContent(modifier: Modifier, movieDetails: Movies? = null) {
-    Column (){
+    Column (
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.SpaceAround,
+
+    ){
         if (movieDetails != null) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text(text = movieDetails.title, fontSize = 24.sp)
+            Column(
+            ) {
                 Image(
-                    painter = rememberAsyncImagePainter(model = "https://image.tmdb.org/t/p/w500${movieDetails.posterIMG}"),
+                    painter = rememberAsyncImagePainter(model = "https://image.tmdb.org/t/p/w500${movieDetails.headerIMG}"),
                     contentDescription = movieDetails.title,
                     modifier = Modifier
-                        .height(300.dp)
                         .fillMaxWidth()
+                        .height(350.dp)
                 )
                 Text(text = "Release Date: ${movieDetails.releaseDate}")
                 Text(text = "Rating: ${movieDetails.rating}")
