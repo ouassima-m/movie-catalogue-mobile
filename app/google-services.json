@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "44626411258",
+    "project_id": "lvl5taks2",
+    "storage_bucket": "lvl5taks2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:44626411258:android:66051d27f981236abb5343",
+        "android_client_info": {
+          "package_name": "com.example.level5task2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBi4BGNjXtmJEoULyuJooV5gOBkYHo94Dw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

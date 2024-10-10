@@ -155,8 +155,6 @@ fun MovieCard(
         onClick = {
             navController.navigate(MovieScreens.MovieDetailsScreen.route + "/${movie.id}")
             Log.d("MovieCard: movie.id", movie.id.toString())
-
-
         }
         ) {
             Image(

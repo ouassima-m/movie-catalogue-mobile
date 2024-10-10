@@ -6,7 +6,9 @@ plugins {
     alias(libs.plugins.kotlin.android)
 
     id("kotlin-kapt")
-//    id("com.google.gms.google-services")
+
+//    id("com.android.application")
+    id("com.google.gms.google-services")
 }
 
 // Load apikey.properties file
@@ -79,6 +81,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.firebase.firestore.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -104,5 +107,8 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
 
     implementation("io.coil-kt:coil-compose:2.4.0")
+
+    implementation(platform("com.google.firebase:firebase-bom:33.4.0"))
+    implementation("com.google.firebase:firebase-analytics")
 
 }
