@@ -1,16 +1,25 @@
 package com.example.level5task2.ui.theme.screens
 
+import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -18,6 +27,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -31,7 +42,11 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
 import com.example.level5task2.R
+import com.example.level5task2.data.api.util.Resource
+import com.example.level5task2.data.model.MovieResult
+import com.example.level5task2.data.model.Movies
 import com.example.level5task2.viewmodel.ViewModel
 
 @Composable
@@ -39,6 +54,10 @@ fun FavoritesScreen(
     navController: NavHostController,
     viewModel: ViewModel
 ){
+//
+
+
+
     Scaffold (
         content = { innerPadding ->
             Column (
@@ -54,7 +73,11 @@ fun FavoritesScreen(
 
                 }
                 FavScreenContent(
-                    modifier= Modifier,
+                    viewModel = viewModel,
+                    modifier = Modifier.fillMaxSize(),
+                    navController = navController
+
+
                 )
             }
 
@@ -64,9 +87,82 @@ fun FavoritesScreen(
 
 
 @Composable
-fun FavScreenContent(modifier: Modifier) {
-    FavHeader()
+fun FavScreenContent(
+    viewModel: ViewModel,
+    modifier: Modifier = Modifier,
+    navController: NavHostController
 
+) {
+
+        FavHeader()
+
+        //    val favMovieResultResource: Resource<List<MovieResult>>? by viewModel.favMovieResultResource.observeAsState()
+        val favMovieResource: Resource<List<Movies>>? by viewModel.favMoviesResource.observeAsState()
+
+
+        val favPosterIMGList = when (favMovieResource) {
+            is Resource.Success -> stringResource(id = R.string.success)
+            is Resource.Error -> favMovieResource?.message
+            is Resource.Loading -> stringResource(R.string.loading_text)
+            is Resource.Empty -> stringResource(id = R.string.maybe_none_empty)
+            else -> stringResource(R.string.something_wrong_state)
+        }
+
+        Column(
+            modifier.padding(1.dp)
+        )
+        {
+            if (favPosterIMGList.equals(stringResource(id = R.string.success)))
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(3)
+                ) {
+                    favMovieResource?.data?.let { movies ->
+                        items(movies) { movie ->
+                            FavMovieCard(
+                                navController = navController,
+                                movie = movie,
+                                viewModel = viewModel
+
+                            )
+                        }
+                    }
+                }
+
+    }
+
+}
+
+
+
+
+
+@Composable
+fun FavMovieCard(
+    navController: NavHostController,
+    movie: Movies,
+    viewModel: ViewModel
+) {
+    Card(
+//        modifier = Modifier.padding(8.dp)
+        onClick = {
+            viewModel.getFavMovieFromFirestore()
+
+            navController.navigate(MovieScreens.MovieDetailsScreen.route + "/${movie.id}")
+            Log.d("MovieCard: movie.id", movie.id.toString())
+        }
+    ) {
+        Image(
+            painter = rememberAsyncImagePainter(model =
+            //todo
+            "https://image.tmdb.org/t/p/w500${movie.posterIMG}"
+            ),
+            contentDescription = movie.title,
+            modifier = Modifier
+                .height(200.dp)
+                .fillMaxWidth()
+        )
+
+    }
 }
 
 @Composable

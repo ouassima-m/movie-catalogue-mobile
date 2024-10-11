@@ -13,7 +13,7 @@ class FavInFirestoreRepository {
         _firestore.collection("favMovies") // Google generated document ID
 
 
-    suspend fun addFavMovieToFirestore(movie: Movies): Resource<String> {
+    suspend fun addFavMovieToFirestore(movie: Movies): Resource<List<Movies>> {
         // Add a new document with a generated id. "number", "type" and "text" are document fields in Firestore.
         val data = hashMapOf(
             "id" to movie.id,
@@ -33,25 +33,53 @@ class FavInFirestoreRepository {
         } catch (e: Exception) {
             return Resource.Error("An unknown error occured while uploading favMovie to Firestore.")
         }
-        return Resource.Success("Success") // Return an initialized String object.
+        return Resource.Success(mutableListOf(movie)) // Return an initialized String object.
     }
 
-//    suspend fun getFavMovieFromFirestore(): Resource<List<String>> {
-//        val historyList = arrayListOf<String>()
-//        try {
-//            withTimeout(5_000) {
-//                _favMoviesDocument
-//                    .get().addOnSuccessListener {
-//                        for (document in it) {
-//                            val text = document.getString("text")
-//                            historyList.add(text!!)
-//                        }
-//                    }
-//                    .await()
-//            }
-//        } catch (e: Exception) {
-//            return Resource.Error("An unknown error occured while retrieving number data from Firestore.")
-//        }
-//        return Resource.Success(historyList)
-//    }
+    suspend fun getFavMovieFromFirestore(): Resource<List<Movies>> {
+        val favMoviesList = arrayListOf<Movies>()
+        try {
+            withTimeout(5_000) {
+                _favMoviesDocument
+                    .get().addOnSuccessListener {
+                        for (document in it) {
+                            val id = document.getLong("id")?.toInt()
+                            val headerIMG = document.getString("headerIMG")?:""
+                            val posterIMG = document.getString("posterIMG")?:""
+                            val title = document.getString("title")?:""
+                            val releaseDate = document.getString("releaseDate")?:""
+                            val rating = document.getDouble("rating")?: 0.0
+                            val overview = document.getString("overview")?:""
+                            val movies = Movies(id!!.toInt(),
+                                headerIMG, posterIMG, title, releaseDate, rating, overview
+                            )
+                            favMoviesList.add(movies)
+                        }
+                    }
+                    .await()
+            }
+        } catch (e: Exception) {
+            return Resource.Error("An unknown error occured while retrieving movies data from Firestore.")
+        }
+        return Resource.Success(favMoviesList)
+    }
+
+
+
+    suspend fun deleteFavMovieFromFirestore(): Resource<List<Movies>> {
+        try {
+            withTimeout(5_000) {
+                _favMoviesDocument
+                    .get().addOnSuccessListener {
+                        for (document in it) {
+                            document.reference.delete()
+                        }
+                    }
+                    .await()
+            }
+        } catch (e: Exception) {
+            return Resource.Error("An unknown error occured while deleting movie from Firestore.")
+        }
+        return Resource.Success(emptyList())
+    }
 }

@@ -48,6 +48,7 @@ import com.example.level5task2.R
 import com.example.level5task2.data.api.util.Resource
 import com.example.level5task2.viewmodel.ViewModel
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.level5task2.data.model.MovieResult
 import com.example.level5task2.data.model.Movies
@@ -88,7 +89,7 @@ fun OverviewScreen(
                         posterIMGList = posterIMGList
 
                     )
-                    FavButton(navController = navController)
+                    FavButton(navController = navController, viewModel = viewModel)
 
                 }
 
@@ -273,10 +274,12 @@ fun SearchView(
 
 @Composable
 fun FavButton(
-    navController: NavHostController
+    navController: NavHostController,
+    viewModel: ViewModel
 ) {
     Button(
         onClick = {
+            viewModel.getFavMovieFromFirestore()
             navController.navigate(MovieScreens.FavoritesScreen.route)
         },
         colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),

@@ -8,4 +8,5 @@
     <string name="maybe_none_empty">Maybe none?</string>
     <string name="something_wrong_state">somthing went wrong</string>
     <string name="overview">Overview</string>
+    <string name="success">succes</string>
 </resources>

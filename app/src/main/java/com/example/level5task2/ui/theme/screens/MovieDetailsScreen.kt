@@ -46,6 +46,8 @@ fun MovieDetailsScreen(
     movieId: Int?
 ){
     val movieDetails: Movies? = viewModel.getMovieById(movieId)
+    Log.d("FavMovieCard: movie.id", movieDetails.toString())
+
 
     Scaffold (
         content = { innerPadding ->
@@ -55,14 +57,23 @@ fun MovieDetailsScreen(
             )
         },
         bottomBar = {
-            DetailsAddButton()
+            DetailsAddButton(
+                addFavMovieToFirestore= {
+                    viewModel.addFavMovieToFirestore(movieDetails!!)
+                }
+            )
         }
     )
+    Log.d("MovieDetailsScreen: movieId", movieId.toString())
+    Log.d("MovieDetailsScreen: movieDetails", movieDetails.toString())
+
 }
 
 
 @Composable
-fun DetailsScreenContent(modifier: Modifier, movieDetails: Movies? = null) {
+fun DetailsScreenContent(
+    modifier: Modifier,
+    movieDetails: Movies? = null) {
 
         if (movieDetails != null) {
             Column(
@@ -138,7 +149,10 @@ fun DetailsScreenContent(modifier: Modifier, movieDetails: Movies? = null) {
 
 
 @Composable
-fun DetailsAddButton() {
+fun DetailsAddButton(
+    addFavMovieToFirestore: (movieDetails: Movies?) -> Unit,
+    movieDetails: Movies? = null
+) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -152,6 +166,7 @@ fun DetailsAddButton() {
 
         Button(
             onClick = {
+                addFavMovieToFirestore(movieDetails)
             },
             colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
             modifier = Modifier.fillMaxWidth()
