@@ -27,6 +27,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -54,9 +55,11 @@ fun FavoritesScreen(
     navController: NavHostController,
     viewModel: ViewModel
 ){
-//
+    val favMovieResource: Resource<List<Movies>>? by viewModel.favMoviesResource.observeAsState()
 
-
+    LaunchedEffect(Unit) {
+        viewModel.getFavMovieFromFirestore()
+    }
 
     Scaffold (
         content = { innerPadding ->
@@ -64,23 +67,22 @@ fun FavoritesScreen(
                 modifier = Modifier
                     .padding(innerPadding)
                     .fillMaxWidth()
-
             ){
                 Row (
                 ){
                     FavSearchView {  }
-                    OverviewButton(navController = navController)
+                    OverviewButton(
+                        navController = navController
+                    )
 
                 }
                 FavScreenContent(
                     viewModel = viewModel,
                     modifier = Modifier.fillMaxSize(),
-                    navController = navController
-
-
+                    navController = navController,
+                    favMovieResource = favMovieResource
                 )
             }
-
         }
     )
 }
@@ -90,15 +92,10 @@ fun FavoritesScreen(
 fun FavScreenContent(
     viewModel: ViewModel,
     modifier: Modifier = Modifier,
-    navController: NavHostController
-
+    navController: NavHostController,
+    favMovieResource: Resource<List<Movies>>? = null
 ) {
-
         FavHeader()
-
-        //    val favMovieResultResource: Resource<List<MovieResult>>? by viewModel.favMovieResultResource.observeAsState()
-        val favMovieResource: Resource<List<Movies>>? by viewModel.favMoviesResource.observeAsState()
-
 
         val favPosterIMGList = when (favMovieResource) {
             is Resource.Success -> stringResource(id = R.string.success)
@@ -127,13 +124,8 @@ fun FavScreenContent(
                         }
                     }
                 }
-
     }
-
 }
-
-
-
 
 
 @Composable
@@ -145,10 +137,8 @@ fun FavMovieCard(
     Card(
 //        modifier = Modifier.padding(8.dp)
         onClick = {
-            viewModel.getFavMovieFromFirestore()
-
             navController.navigate(MovieScreens.MovieDetailsScreen.route + "/${movie.id}")
-            Log.d("MovieCard: movie.id", movie.id.toString())
+            Log.d("MovieCard(fav): movie.id", movie.id.toString())
         }
     ) {
         Image(
@@ -161,7 +151,6 @@ fun FavMovieCard(
                 .height(200.dp)
                 .fillMaxWidth()
         )
-
     }
 }
 
@@ -213,10 +202,8 @@ fun FavSearchView(
         },
         trailingIcon = {
             IconButton(onClick = {
-                // TODO your logic here
+                searchTMDB(searchQueryState.value.text)
 
-                //based on @ExperimentalComposeUiApi - if this doesn't work in a newer version remove it
-                //no alternative in compose for hiding keyboard at time of writing
                 keyboardController?.hide()
             }) {
                 Icon(

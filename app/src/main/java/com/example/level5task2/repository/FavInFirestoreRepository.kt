@@ -1,6 +1,5 @@
 package com.example.level5task2.repository
 
-import android.graphics.Movie
 import com.example.level5task2.data.api.util.Resource
 import com.example.level5task2.data.model.Movies
 import com.google.firebase.firestore.FirebaseFirestore
@@ -64,14 +63,14 @@ class FavInFirestoreRepository {
         return Resource.Success(favMoviesList)
     }
 
-
-
-    suspend fun deleteFavMovieFromFirestore(): Resource<List<Movies>> {
+    suspend fun deleteFavMovieFromFirestore(movie: Movies): Resource<List<Movies>> {
         try {
             withTimeout(5_000) {
                 _favMoviesDocument
-                    .get().addOnSuccessListener {
-                        for (document in it) {
+                    .whereEqualTo("id", movie.id)
+                    //using whereEqualTo Firestore returns the results in a QuerySnapshot
+                    .get().addOnSuccessListener { querySnapshot ->
+                        for (document in querySnapshot) {
                             document.reference.delete()
                         }
                     }

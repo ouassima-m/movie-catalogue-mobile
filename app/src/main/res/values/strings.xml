@@ -9,4 +9,6 @@
     <string name="something_wrong_state">somthing went wrong</string>
     <string name="overview">Overview</string>
     <string name="success">succes</string>
+    <string name="add_fav">Currently not favorite. Favorize:</string>
+    <string name="remove_fav">Currently favorite. Unfavored:</string>
 </resources>

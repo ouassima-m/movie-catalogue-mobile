@@ -279,7 +279,7 @@ fun FavButton(
 ) {
     Button(
         onClick = {
-            viewModel.getFavMovieFromFirestore()
+//            viewModel.getFavMovieFromFirestore()
             navController.navigate(MovieScreens.FavoritesScreen.route)
         },
         colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),

@@ -5,7 +5,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.level5task2.data.api.util.Resource
 import com.example.level5task2.data.model.MovieResult
 import com.example.level5task2.data.model.Movies
@@ -46,10 +45,11 @@ class ViewModel : ViewModel(){
 //        return _movieResult.value?.data?.results?.find { it.id == movieId }
 //    }
 fun getMovieById(movieId: Int?): Movies? {
-    // Try to find the movie in _movieResult first if it's null, try _favMovieResult
-    return _movieResult.value?.data?.results?.find { it.id == movieId }
-        ?: _favMovieResult.value?.data?.results?.find { it.id == movieId }
+    return _favMoviesResource.value?.data?.find { it.id == movieId }
+        ?: _movieResult.value?.data?.results?.find { it.id == movieId }
 }
+
+
 
 
 
@@ -65,6 +65,9 @@ fun getMovieById(movieId: Int?): Movies? {
     private val _favMoviesResource: MutableLiveData<Resource<List<Movies>>> = MutableLiveData(Resource.Empty())
 
 
+    val movieIsFavResource: LiveData<Boolean> get() = _movieIsFav
+    private val _movieIsFav: MutableLiveData<Boolean> = MutableLiveData()
+
 
     fun addFavMovieToFirestore(movie: Movies) {
 
@@ -75,32 +78,43 @@ fun getMovieById(movieId: Int?): Movies? {
                 _favMoviesResource.value =
                     _favInFirestoreRepository.addFavMovieToFirestore(movie)
                 Log.d("ViewModel: addFavMovieToFirestore", "$_favMoviesResource is added to firestore")
+//                updateMovieIsFavStatus(movie)
+                _movieIsFav.value = true
+
             }
         }
         else {
-            Log.d("ViewModel: addFavMovieToFirestore", "$_favMoviesResource is already added to firestore")
+            Log.d("ViewModel: addFavMovieToFirestore", "$_favMoviesResource is already added to firestore deleting it now")
+            deleteFavMovieFromFirestore(movie)
         }
+    }
 
-
+    fun updateMovieIsFavStatus(movie: Movies?) {
+        _movieIsFav.value = movieIsFav(movie)
     }
 
     fun getFavMovieFromFirestore() {
+        Log.d("......ViewModel: favMoviesResource", _favMoviesResource.value.toString())
+
         _favMovieResult.value = Resource.Loading()
 
         viewModelScope.launch {
-            _favMoviesResource.value =
-                _favInFirestoreRepository.getFavMovieFromFirestore()
+            _favMoviesResource.value = _favInFirestoreRepository.getFavMovieFromFirestore()
+
         }
     }
 
     fun deleteFavMovieFromFirestore(movie: Movies) {
         viewModelScope.launch {
-            _favInFirestoreRepository.deleteFavMovieFromFirestore()
+            _favInFirestoreRepository.deleteFavMovieFromFirestore(movie)
+            getFavMovieFromFirestore()
+//            updateMovieIsFavStatus(movie)
+            _movieIsFav.value = false
+
         }
     }
 
-    fun movieIsFav(movie: Movies): Boolean {
-        return _favMoviesResource.value?.data?.any { it.id == movie.id } == true
+    fun movieIsFav(movie: Movies?): Boolean {
+        return _favMoviesResource.value?.data?.any { it.id == movie?.id } == true
     }
-
 }
