@@ -16,6 +16,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.AbsoluteRoundedCornerShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
@@ -26,6 +28,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -48,6 +51,7 @@ import com.example.level5task2.R
 import com.example.level5task2.data.api.util.Resource
 import com.example.level5task2.viewmodel.ViewModel
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.draw.clip
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.level5task2.data.model.MovieResult
@@ -61,6 +65,7 @@ fun OverviewScreen(
 ){
     val movieResultResource : Resource<MovieResult>? by viewModel.movieResultResource.observeAsState()
     val moviesResource : Resource<Movies>? by viewModel.moviesResource.observeAsState()
+    val searchStarted = rememberSaveable { mutableStateOf(false) }
 
     val posterIMGList = when (moviesResource) {
         is Resource.Success -> moviesResource?.data?.posterIMG
@@ -85,6 +90,7 @@ fun OverviewScreen(
                             movie: String ->
                             viewModel.getMovies(movie)
                             Log.d("overview: searchTMDB", movie)
+                            searchStarted.value = true
                         },
                         posterIMGList = posterIMGList
 
@@ -99,7 +105,8 @@ fun OverviewScreen(
                     movieResultResource = movieResultResource,
                     isLoading = moviesResource is Resource.Loading,
                     hasNoResults = moviesResource is Resource.Empty,
-                    navController = navController
+                    navController = navController,
+                    searchStarted = searchStarted.value
                 )
             }
 
@@ -113,29 +120,48 @@ fun Display(
     moviesResource: Resource<Movies>?,
     movieResultResource: Resource<MovieResult>?,
     isLoading: Boolean,
-    hasNoResults: Boolean
+    hasNoResults: Boolean,
+    searchStarted: Boolean
 ) {
     Log.d("Display: moviesResource", moviesResource.toString())
     Log.d("Display: movieResultResource", movieResultResource.toString())
 
-    if (isLoading) {
+    if (!searchStarted) {
+        Text(
+            text = stringResource(R.string.search_movie_hint_header),
+            modifier = Modifier.padding(32.dp),
+            style = MaterialTheme.typography.headlineMedium,
+        )
+    }
+    else if (movieResultResource is Resource.Loading) {
         Log.d("Display: movieResult is loading", movieResultResource?.data?.results.toString())
 
-        Text(text = "Loading...", modifier = Modifier.padding(16.dp), fontSize = 18.sp)
+        Text(
+            text = stringResource(R.string.loading_text),
+            modifier = Modifier.padding(16.dp),
+            style = MaterialTheme.typography.headlineMedium,
+        )
     } else if (hasNoResults || (movieResultResource?.data?.results.isNullOrEmpty())) {
         Log.d("Display: movieResult has no results", movieResultResource?.data?.results.toString())
 
-        Text(text = "Maybe none?", modifier = Modifier.padding(16.dp), fontSize = 18.sp)
+        Text(
+            text = stringResource(R.string.maybe_none_empty),
+            modifier = Modifier.padding(16.dp),
+            style = MaterialTheme.typography.headlineMedium,
+        )
     } else {
         Log.d("Display: movieResult else", movieResultResource?.data?.results.toString())
 
         movieResultResource?.data?.results?.let { movies ->
             LazyVerticalGrid (
-                columns = GridCells.Fixed(3)
+//                columns = GridCells.Fixed(3)
+                columns = GridCells.Adaptive(minSize = 137.dp),
+
 
             ){
                 items(movies) { movie ->
                     MovieCard(
+                        modifier = Modifier.clip(RoundedCornerShape(0.dp)),
                         navController = navController,
                         movie = movie,
 
@@ -150,9 +176,10 @@ fun Display(
 fun MovieCard(
     navController: NavHostController,
     movie: Movies,
+    modifier: Modifier
 ) {
     Card(
-//        modifier = Modifier.padding(8.dp)
+        modifier = Modifier.clip(AbsoluteRoundedCornerShape(0)),
         onClick = {
             navController.navigate(MovieScreens.MovieDetailsScreen.route + "/${movie.id}")
             Log.d("MovieCard: movie.id", movie.id.toString())
@@ -166,7 +193,7 @@ fun MovieCard(
                 contentDescription = movie.title,
                 modifier = Modifier
                     .height(200.dp)
-                    .fillMaxWidth()
+                    .fillMaxWidth().clip(RoundedCornerShape(0.dp))
             )
 
     }

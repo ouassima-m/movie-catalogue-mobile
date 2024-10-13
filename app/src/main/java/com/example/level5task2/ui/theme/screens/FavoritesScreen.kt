@@ -101,7 +101,7 @@ fun FavScreenContent(
             is Resource.Success -> stringResource(id = R.string.success)
             is Resource.Error -> favMovieResource?.message
             is Resource.Loading -> stringResource(R.string.loading_text)
-            is Resource.Empty -> stringResource(id = R.string.maybe_none_empty)
+//            is Resource.Empty -> stringResource(id = R.string.maybe_none_empty)
             else -> stringResource(R.string.something_wrong_state)
         }
 
@@ -109,7 +109,15 @@ fun FavScreenContent(
             modifier.padding(1.dp)
         )
         {
-            if (favPosterIMGList.equals(stringResource(id = R.string.success)))
+            if (favMovieResource is Resource.Empty || (favMovieResource?.data?.isNullOrEmpty() == true)){
+                Text(
+                    text = stringResource(R.string.maybe_none_empty),
+                    modifier = Modifier.padding(16.dp),
+                    style = MaterialTheme.typography.headlineMedium,
+                )
+            }
+
+            else if (favPosterIMGList.equals(stringResource(id = R.string.success))){
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(3)
                 ) {
@@ -124,6 +132,8 @@ fun FavScreenContent(
                         }
                     }
                 }
+            }
+
     }
 }
 

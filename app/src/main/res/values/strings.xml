@@ -2,9 +2,10 @@
     <string name="app_name">Level5Task2</string>
     <string name="search_placeholder">testtest</string>
     <string name="search_movie_hint">Search for a movie by name</string>
+    <string name="search_movie_hint_header">Search for a movie! or get favorites</string>
     <string name="favHeader">Your favorite movies !</string>
     <string name="add_and_remove_fav">Currently not favorite. Favorize:</string>
-    <string name="loading_text">loading</string>
+    <string name="loading_text">loading...</string>
     <string name="maybe_none_empty">Maybe none?</string>
     <string name="something_wrong_state">somthing went wrong</string>
     <string name="overview">Overview</string>
