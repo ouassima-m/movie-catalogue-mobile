@@ -45,13 +45,6 @@ fun MovieDetailsScreen(
     movieId: Int?,
 ){
 
-
-//    viewModel.getFavMovieFromFirestore()
-//    val movieIsFav: Boolean = viewModel.movieIsFav(movieDetails)
-//    val movieIsFav: Boolean by viewModel.movieIsFavResource.observeAsState()
-//    val movieIsFav: Boolean? by viewModel.movieIsFavResource.observeAsState()
-//    var movieIsFav by remember { mutableStateOf(viewModel.movieIsFav(movieDetails)) }
-
     val movieDetails: Movies? = viewModel.getMovieById(movieId)
     Log.d("FavMovieCard: movie.id", movieDetails.toString())
 
@@ -73,11 +66,8 @@ fun MovieDetailsScreen(
             DetailsAddButton(
                 addFavMovieToFirestore = {
                     viewModel.addFavMovieToFirestore(movieDetails!!)
-//                    movieIsFav = movieIsFav
                 },
                 movieIsFav = movieIsFav == true,
-                viewModel = viewModel,
-                movieDetails = movieDetails
             )
         }
     )
@@ -164,13 +154,7 @@ fun DetailsScreenContent(
 @Composable
 fun DetailsAddButton(
     addFavMovieToFirestore: () -> Unit,
-//    movieDetails: Movies? = null,
-//    movieIsFav: (movieDetails: Movies?) -> Boolean
-//    movieIsFav: Boolean
-//    movieIsFav: Boolean?
     movieIsFav: Boolean,
-    viewModel: ViewModel,
-    movieDetails: Movies?
     ) {
     Column(
         modifier = Modifier.fillMaxWidth(),

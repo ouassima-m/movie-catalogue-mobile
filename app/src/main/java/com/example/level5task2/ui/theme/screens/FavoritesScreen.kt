@@ -70,7 +70,13 @@ fun FavoritesScreen(
             ){
                 Row (
                 ){
-                    FavSearchView {  }
+                    SearchView(
+                        searchTMDB = {
+                                movie: String ->
+                            viewModel.getMovies(movie)
+                            Log.d("overview: searchTMDB", movie)
+                        }
+                    )
                     OverviewButton(
                         navController = navController
                     )
@@ -98,10 +104,10 @@ fun FavScreenContent(
         FavHeader()
 
         val favPosterIMGList = when (favMovieResource) {
-            is Resource.Success -> stringResource(id = R.string.success)
+            is Resource.Success -> ""
             is Resource.Error -> favMovieResource?.message
-            is Resource.Loading -> stringResource(R.string.loading_text)
-//            is Resource.Empty -> stringResource(id = R.string.maybe_none_empty)
+            is Resource.Loading -> ""
+            is Resource.Empty -> ""
             else -> stringResource(R.string.something_wrong_state)
         }
 
@@ -117,7 +123,7 @@ fun FavScreenContent(
                 )
             }
 
-            else if (favPosterIMGList.equals(stringResource(id = R.string.success))){
+            else if (favMovieResource is Resource.Success){
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(3)
                 ) {
@@ -145,7 +151,6 @@ fun FavMovieCard(
     viewModel: ViewModel
 ) {
     Card(
-//        modifier = Modifier.padding(8.dp)
         onClick = {
             navController.navigate(MovieScreens.MovieDetailsScreen.route + "/${movie.id}")
             Log.d("MovieCard(fav): movie.id", movie.id.toString())
@@ -153,7 +158,6 @@ fun FavMovieCard(
     ) {
         Image(
             painter = rememberAsyncImagePainter(model =
-            //todo
             "https://image.tmdb.org/t/p/w500${movie.posterIMG}"
             ),
             contentDescription = movie.title,
@@ -173,68 +177,6 @@ fun FavHeader() {
     )
 
 }
-
-
-@OptIn(ExperimentalComposeUiApi::class)
-@Composable
-fun FavSearchView(
-    searchTMDB: (String) -> Unit
-) {
-    val searchQueryState = rememberSaveable(stateSaver = TextFieldValue.Saver)  {
-        mutableStateOf(TextFieldValue(String()))
-    }
-    val keyboardController = LocalSoftwareKeyboardController.current
-
-    TextField(
-        value = searchQueryState.value,
-        onValueChange = { value ->
-            searchQueryState.value = value
-        },
-//        modifier = Modifier.fillMaxWidth(),
-        textStyle = TextStyle(fontSize = 18.sp),
-        leadingIcon = {
-            if (searchQueryState.value != TextFieldValue(String())) {
-                IconButton(
-                    onClick = {
-                        searchQueryState.value =
-                            TextFieldValue(String()) // Remove text from TextField when you press the 'X' icon
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = "Remove search argument",
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .size(24.dp)
-                    )
-                }
-            }
-        },
-        trailingIcon = {
-            IconButton(onClick = {
-                searchTMDB(searchQueryState.value.text)
-
-                keyboardController?.hide()
-            }) {
-                Icon(
-                    Icons.Default.Search,
-                    contentDescription = "Search for  movies in TMDB based on search argument provided",
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .size(24.dp),
-                )
-            }
-        },
-        placeholder = {
-            Text(
-                text = stringResource(R.string.search_movie_hint)
-            )
-        },
-        singleLine = true,
-        shape = RectangleShape, // The TextFiled has rounded corners top left and right by default
-    )
-}
-
 
 @Composable
 fun OverviewButton(navController: NavHostController) {
@@ -256,5 +198,69 @@ fun OverviewButton(navController: NavHostController) {
         )
     }
 }
+
+
+//@OptIn(ExperimentalComposeUiApi::class)
+//@Composable
+//fun FavSearchView(
+//    searchTMDB: (String) -> Unit
+//) {
+//    val searchQueryState = rememberSaveable(stateSaver = TextFieldValue.Saver)  {
+//        mutableStateOf(TextFieldValue(String()))
+//    }
+//    val keyboardController = LocalSoftwareKeyboardController.current
+//
+//    TextField(
+//        value = searchQueryState.value,
+//        onValueChange = { value ->
+//            searchQueryState.value = value
+//        },
+////        modifier = Modifier.fillMaxWidth(),
+//        textStyle = TextStyle(fontSize = 18.sp),
+//        leadingIcon = {
+//            if (searchQueryState.value != TextFieldValue(String())) {
+//                IconButton(
+//                    onClick = {
+//                        searchQueryState.value =
+//                            TextFieldValue(String()) // Remove text from TextField when you press the 'X' icon
+//                    }
+//                ) {
+//                    Icon(
+//                        imageVector = Icons.Default.Close,
+//                        contentDescription = "Remove search argument",
+//                        modifier = Modifier
+//                            .padding(8.dp)
+//                            .size(24.dp)
+//                    )
+//                }
+//            }
+//        },
+//        trailingIcon = {
+//            IconButton(onClick = {
+//                searchTMDB(searchQueryState.value.text)
+//
+//                keyboardController?.hide()
+//            }) {
+//                Icon(
+//                    Icons.Default.Search,
+//                    contentDescription = "Search for  movies in TMDB based on search argument provided",
+//                    modifier = Modifier
+//                        .padding(8.dp)
+//                        .size(24.dp),
+//                )
+//            }
+//        },
+//        placeholder = {
+//            Text(
+//                text = stringResource(R.string.search_movie_hint)
+//            )
+//        },
+//        singleLine = true,
+//        shape = RectangleShape, // The TextFiled has rounded corners top left and right by default
+//    )
+//}
+
+
+
 
 

@@ -92,10 +92,11 @@ fun OverviewScreen(
                             Log.d("overview: searchTMDB", movie)
                             searchStarted.value = true
                         },
-                        posterIMGList = posterIMGList
 
                     )
-                    FavButton(navController = navController, viewModel = viewModel)
+                    FavButton(
+                        navController = navController,
+                    )
 
                 }
 
@@ -103,7 +104,6 @@ fun OverviewScreen(
                     viewModel = viewModel,
                     moviesResource = moviesResource,
                     movieResultResource = movieResultResource,
-                    isLoading = moviesResource is Resource.Loading,
                     hasNoResults = moviesResource is Resource.Empty,
                     navController = navController,
                     searchStarted = searchStarted.value
@@ -119,7 +119,6 @@ fun Display(
     navController: NavHostController,
     moviesResource: Resource<Movies>?,
     movieResultResource: Resource<MovieResult>?,
-    isLoading: Boolean,
     hasNoResults: Boolean,
     searchStarted: Boolean
 ) {
@@ -201,108 +200,71 @@ fun MovieCard(
 
 
 
-@OptIn(ExperimentalComposeUiApi::class)
-@Composable
-fun SearchView(
-    searchTMDB: (String) -> Unit,
-    posterIMGList: Any?,
-) {
-    val searchQueryState = rememberSaveable(stateSaver = TextFieldValue.Saver)  {
-        mutableStateOf(TextFieldValue(String()))
-    }
-    val keyboardController = LocalSoftwareKeyboardController.current
-
-    TextField(
-        value = searchQueryState.value,
-        onValueChange = { value ->
-            searchQueryState.value = value
-        },
-//        modifier = Modifier.fillMaxWidth(),
-        textStyle = TextStyle(fontSize = 18.sp),
-        leadingIcon = {
-            if (searchQueryState.value != TextFieldValue(String())) {
-                IconButton(
-                    onClick = {
-                        searchQueryState.value =
-                            TextFieldValue(String()) // Remove text from TextField when you press the 'X' icon
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = "Remove search argument",
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .size(24.dp)
-                    )
-                }
-            }
-        },
-        trailingIcon = {
-            IconButton(onClick = {
-                searchTMDB(searchQueryState.value.text)
-                Log.d("overview: searchQueryState.value.text", searchQueryState.value.text)
-//                Log.d("overvw test","hereee ${posterIMGList.toString()}")
-                keyboardController?.hide()
-            }) {
-                Icon(
-                    Icons.Default.Search,
-                    contentDescription = "Search for  movies in TMDB based on search argument provided",
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .size(24.dp),
-                )
-            }
-        },
-        placeholder = {
-            Text(
-                text = stringResource(R.string.search_movie_hint)
-            )
-        },
-        singleLine = true,
-        shape = RectangleShape, // The TextFiled has rounded corners top left and right by default
-    )
-}
-
-
+//@OptIn(ExperimentalComposeUiApi::class)
 //@Composable
-//fun Movie(
-//    posterIMGlist: String?
-//){
-//    LazyVerticalGrid(
-//        columns = GridCells.Fixed(3)
-//    ) {
-//        items(items = posterIMGlist, itemContent = { item ->
-//            MovieCard(item)
-//            Log.d("Movie heree", item)
-//        }
-//        )
-//    }
-//}
-
-//@Composable
-//fun MovieCard(
-//    item: String
+//fun SearchView(
+//    searchTMDB: (String) -> Unit,
 //) {
-//    Card (
-//        modifier = Modifier,
-//        onClick = {}
-//    ){
-//        Image(
-//            painter = rememberAsyncImagePainter(model = item),
-//            contentDescription = "cat image here",
-//            modifier = Modifier
-//                .height(300.dp)
-//                .width(300.dp)
-//                .padding(15.dp)
-//        )
+//    val searchQueryState = rememberSaveable(stateSaver = TextFieldValue.Saver)  {
+//        mutableStateOf(TextFieldValue(String()))
 //    }
+//    val keyboardController = LocalSoftwareKeyboardController.current
+//
+//    TextField(
+//        value = searchQueryState.value,
+//        onValueChange = { value ->
+//            searchQueryState.value = value
+//        },
+////        modifier = Modifier.fillMaxWidth(),
+//        textStyle = TextStyle(fontSize = 18.sp),
+//        leadingIcon = {
+//            if (searchQueryState.value != TextFieldValue(String())) {
+//                IconButton(
+//                    onClick = {
+//                        searchQueryState.value =
+//                            TextFieldValue(String()) // Remove text from TextField when you press the 'X' icon
+//                    }
+//                ) {
+//                    Icon(
+//                        imageVector = Icons.Default.Close,
+//                        contentDescription = "Remove search argument",
+//                        modifier = Modifier
+//                            .padding(8.dp)
+//                            .size(24.dp)
+//                    )
+//                }
+//            }
+//        },
+//        trailingIcon = {
+//            IconButton(onClick = {
+//                searchTMDB(searchQueryState.value.text)
+//                Log.d("overview: searchQueryState.value.text", searchQueryState.value.text)
+////                Log.d("overvw test","hereee ${posterIMGList.toString()}")
+//                keyboardController?.hide()
+//            }) {
+//                Icon(
+//                    Icons.Default.Search,
+//                    contentDescription = "Search for  movies in TMDB based on search argument provided",
+//                    modifier = Modifier
+//                        .padding(8.dp)
+//                        .size(24.dp),
+//                )
+//            }
+//        },
+//        placeholder = {
+//            Text(
+//                text = stringResource(R.string.search_movie_hint)
+//            )
+//        },
+//        singleLine = true,
+//        shape = RectangleShape, // The TextFiled has rounded corners top left and right by default
+//    )
 //}
 
 
 @Composable
 fun FavButton(
     navController: NavHostController,
-    viewModel: ViewModel
 ) {
     Button(
         onClick = {
